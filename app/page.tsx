@@ -195,6 +195,12 @@ export default function Home() {
   const [reportError, setReportError] = useState("");
   const [reportMarkdown, setReportMarkdown] = useState("");
   const [reportOpen, setReportOpen] = useState(false);
+  const [envCheck, setEnvCheck] = useState<{
+    hasOpenAIKey: boolean;
+    vercelEnv: string;
+    vercelUrl: string;
+  } | null>(null);
+  const [envCheckError, setEnvCheckError] = useState("");
 
   useEffect(() => {
     if (manualEdited) return;
@@ -383,6 +389,20 @@ export default function Home() {
       return;
     }
     await enhanceSpecWithLlm();
+  }
+
+  async function checkLlmEnv(): Promise<void> {
+    setEnvCheckError("");
+    try {
+      const response = await fetch("/api/health/env", { method: "GET" });
+      if (!response.ok) {
+        throw new Error("Failed to check env.");
+      }
+      const payload = await response.json();
+      setEnvCheck(payload);
+    } catch (checkError) {
+      setEnvCheckError(checkError instanceof Error ? checkError.message : "Env check failed.");
+    }
   }
 
   function runRecon(event: FormEvent<HTMLFormElement>) {
@@ -700,9 +720,19 @@ export default function Home() {
                   {llmLoading ? "LLM..." : "LLM"}
                 </button>
               </div>
+              <button type="button" className="table-btn" onClick={() => void checkLlmEnv()}>
+                Check LLM Env
+              </button>
             </div>
           </div>
           {llmError ? <p className="error-text">{llmError}</p> : null}
+          {envCheck ? (
+            <p className="meta-line">
+              Env check: {envCheck.hasOpenAIKey ? "OPENAI_API_KEY found" : "OPENAI_API_KEY missing"} | env:{" "}
+              {envCheck.vercelEnv} {envCheck.vercelUrl ? `| host: ${envCheck.vercelUrl}` : ""}
+            </p>
+          ) : null}
+          {envCheckError ? <p className="error-text">{envCheckError}</p> : null}
           {spec ? (
             <div className="recon-sections">
               <div className="section-box">
