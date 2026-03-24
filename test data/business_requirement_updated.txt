@@ -1,0 +1,72 @@
+Business Requirement: Advanced Order-Payment Reconciliation
+
+Objective:
+Reconcile order records from the order system with payment records from the payment gateway, ensuring accuracy, completeness, and auditability.
+
+Important Constraint:
+- The dashboard structure and metrics are FIXED and should not be modified.
+- Any additional analysis, insights, or advanced metrics MUST be included in a detailed reconciliation report (text output).
+
+---
+
+Reconciliation Rules:
+
+1. Key Mapping:
+   - Match orders.order_id with payments.txn_reference
+   - Matching should ignore case and trim whitespace
+
+
+2. Amount Validation:
+   - Compare orders.order_amount with payments.paid_amount
+   - Flag mismatches where absolute difference > 2 USD
+   - Also compute percentage difference for reporting
+
+---
+
+Exception Types to Identify:
+
+- Missing Payments:
+  Orders that have no corresponding payment
+
+- Orphan Payments:
+  Payments that do not map to any order
+
+- Amount Mismatches:
+  Records where amount difference exceeds tolerance
+
+- Late Payments:
+  Payments occurring beyond the allowed time window
+
+
+---
+
+Additional Reporting (REQUIRED):
+
+In addition to the dashboard, generate a detailed reconciliation report including:
+
+1. Breakdown of Issues:
+   - Count and percentage of each issue type
+
+2. Financial Impact:
+   - Total discrepancy value
+   - Top 5 largest mismatches
+
+3. Timing Analysis:
+   - Average payment delay
+   - Distribution of delays (on-time vs late)
+
+4. Data Quality Insights:
+   - Duplicate keys (if any)
+   - Suspicious patterns (e.g., repeated mismatches)
+
+5. Field Mapping Explanation:
+   - Explain how columns were matched (order_id ↔ txn_reference, etc.)
+
+6. Summary:
+   - High-level explanation of reconciliation health
+   - Key risks or anomalies detected
+
+---
+
+Goal:
+Ensure the reconciliation process is not only accurate but also explainable and auditable, with clear insights provided in the report beyond the fixed dashboard metrics.

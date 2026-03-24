@@ -1,0 +1,22 @@
+Business Requirement: Order-Payment Reconciliation
+
+Objective:
+Reconcile order records from the order system with payment records from the gateway.
+
+Rules:
+1. Match orders.order_id with payments.txn_reference
+2. Payment must occur within 2 days after order_date
+3. Only include payments with status = completed or settled
+4. Flag amount mismatches where abs(order_amount - paid_amount) > 2 USD
+5. Identify:
+   - Missing payments
+   - Orphan payments
+   - Amount mismatches
+   - Late payments
+
+Metrics:
+- Match rate
+- Missing payment count
+- Orphan payment count
+- Total mismatch value
+- Avg payment delay
